@@ -1,5 +1,5 @@
 """
-Aplicação web com Streamlit - Versão Estável para Cloud
+Aplicação web com Streamlit - Versão Compatível com Python 3.14+
 """
 
 import streamlit as st
@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import requests
 from io import BytesIO
+import sys
 
 # ============================================
 # CONFIGURAÇÃO DA PÁGINA
@@ -21,26 +22,31 @@ st.set_page_config(
     layout="centered"
 )
 
-
+# ============================================
+# TÍTULO E DESCRIÇÃO
+# ============================================
 st.title("🤖 Classificador de Imagens")
 
 st.markdown("""
 Envie uma imagem e o modelo vai classificar entre **10 categorias**:
 
- Avião |  Automóvel |  Pássaro |  Gato |  Veado |  Cachorro |  Sapo |  Cavalo |  Navio |  Caminhão
+✈️ Avião | 🚗 Automóvel | 🐦 Pássaro | 🐱 Gato | 🦌 Veado | 🐕 Cachorro | 🐸 Sapo | 🐴 Cavalo | 🚢 Navio | 🚛 Caminhão
 """)
 
+# ============================================
+# CLASSES E MAPEAMENTO
+# ============================================
 CLASSES_CIFAR10 = ['Avião', 'Automóvel', 'Pássaro', 'Gato', 'Veado', 
                    'Cachorro', 'Sapo', 'Cavalo', 'Navio', 'Caminhão']
 
 # Mapeamento de classes do ImageNet para CIFAR-10
 MAPEAMENTO_IMAGENET = {
-  
+    # Avião
     404: 'Avião', 405: 'Avião', 406: 'Avião', 407: 'Avião', 408: 'Avião',
     # Automóvel
     436: 'Automóvel', 437: 'Automóvel', 438: 'Automóvel', 439: 'Automóvel', 
     440: 'Automóvel', 441: 'Automóvel', 442: 'Automóvel', 443: 'Automóvel',
-
+    # Pássaro
     8: 'Pássaro', 9: 'Pássaro', 10: 'Pássaro', 11: 'Pássaro', 12: 'Pássaro',
     13: 'Pássaro', 14: 'Pássaro', 15: 'Pássaro', 16: 'Pássaro', 17: 'Pássaro',
     18: 'Pássaro', 19: 'Pássaro', 20: 'Pássaro', 21: 'Pássaro', 22: 'Pássaro',
@@ -49,14 +55,14 @@ MAPEAMENTO_IMAGENET = {
     88: 'Pássaro', 89: 'Pássaro', 90: 'Pássaro', 91: 'Pássaro', 92: 'Pássaro',
     93: 'Pássaro', 94: 'Pássaro', 95: 'Pássaro', 96: 'Pássaro', 97: 'Pássaro',
     98: 'Pássaro', 99: 'Pássaro', 100: 'Pássaro',
- 
+    # Gato
     281: 'Gato', 282: 'Gato', 283: 'Gato', 284: 'Gato', 285: 'Gato',
     286: 'Gato', 287: 'Gato', 288: 'Gato', 289: 'Gato', 290: 'Gato',
     291: 'Gato', 292: 'Gato', 293: 'Gato', 294: 'Gato', 295: 'Gato',
-
+    # Veado
     341: 'Veado', 342: 'Veado', 343: 'Veado', 344: 'Veado', 345: 'Veado',
     346: 'Veado', 347: 'Veado', 348: 'Veado',
-  
+    # Cachorro
     151: 'Cachorro', 152: 'Cachorro', 153: 'Cachorro', 154: 'Cachorro',
     155: 'Cachorro', 156: 'Cachorro', 157: 'Cachorro', 158: 'Cachorro',
     159: 'Cachorro', 160: 'Cachorro', 161: 'Cachorro', 162: 'Cachorro',
@@ -73,15 +79,15 @@ MAPEAMENTO_IMAGENET = {
     203: 'Cachorro', 204: 'Cachorro', 205: 'Cachorro', 206: 'Cachorro',
     207: 'Cachorro', 208: 'Cachorro', 209: 'Cachorro', 210: 'Cachorro',
     211: 'Cachorro', 212: 'Cachorro',
-
+    # Sapo
     30: 'Sapo', 31: 'Sapo', 32: 'Sapo', 33: 'Sapo', 34: 'Sapo',
     349: 'Sapo', 350: 'Sapo',
-
+    # Cavalo
     354: 'Cavalo', 355: 'Cavalo', 356: 'Cavalo', 357: 'Cavalo',
-
+    # Navio
     779: 'Navio', 780: 'Navio', 781: 'Navio', 782: 'Navio', 783: 'Navio',
     784: 'Navio', 785: 'Navio', 786: 'Navio', 787: 'Navio',
-
+    # Caminhão
     555: 'Caminhão', 556: 'Caminhão', 557: 'Caminhão', 558: 'Caminhão',
     559: 'Caminhão', 560: 'Caminhão', 561: 'Caminhão', 562: 'Caminhão',
     563: 'Caminhão', 564: 'Caminhão', 565: 'Caminhão', 566: 'Caminhão',
@@ -94,17 +100,32 @@ MAPEAMENTO_IMAGENET = {
     591: 'Caminhão', 592: 'Caminhão',
 }
 
-
+# ============================================
+# CARREGAR MODELO
+# ============================================
 @st.cache_resource
 def carregar_modelo():
     """Carrega o modelo ResNet18 pré-treinado"""
     try:
-        dispositivo = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        modelo = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+        # Verificar versão do Python
+        st.info(f"🐍 Python {sys.version}")
+        
+        # Detectar dispositivo
+        if torch.cuda.is_available():
+            dispositivo = torch.device("cuda")
+            st.success("🟢 GPU detectada!")
+        else:
+            dispositivo = torch.device("cpu")
+            st.info("🟡 Usando CPU (mais lento)")
+        
+        # Carregar modelo - versão compatível
+        modelo = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
         modelo = modelo.to(dispositivo)
         modelo.eval()
+        
         return modelo, dispositivo, True
     except Exception as e:
+        st.error(f"❌ Erro ao carregar modelo: {e}")
         return None, None, False
 
 def traduzir_classe(idx):
@@ -129,7 +150,9 @@ def preprocessar_imagem(imagem):
     tensor = tensor.unsqueeze(0)
     return tensor
 
-
+# ============================================
+# CLASSIFICAR
+# ============================================
 def classificar_imagem(modelo, tensor, dispositivo):
     """Classifica a imagem"""
     tensor = tensor.to(dispositivo)
@@ -144,11 +167,13 @@ def classificar_imagem(modelo, tensor, dispositivo):
     top5_idx = top5_idx.cpu().numpy().flatten()
     
     # Tentar encontrar classe traduzida
-    for idx in top5_idx:
+    classe_encontrada = None
+    prob_encontrada = 0
+    
+    for idx, prob in zip(top5_idx, top5_prob):
         classe = traduzir_classe(idx)
         if classe:
-            prob_idx = top5_idx.tolist().index(idx)
-            return classe, top5_prob[prob_idx] * 100, top5_prob, top5_idx
+            return classe, prob * 100, top5_prob, top5_idx
     
     # Se não encontrou nenhuma classe mapeada
     return "Classe não mapeada", 0, top5_prob, top5_idx
