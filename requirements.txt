@@ -1,0 +1,21 @@
+# Core
+torch==2.6.0
+torchvision==0.21.0
+numpy>=2.5.1
+
+# Visualização
+matplotlib>=3.10.0
+seaborn>=0.13.2
+
+# Processamento de dados
+pandas>=2.3.0
+scikit-learn>=1.6.0
+pillow>=12.3.0
+opencv-python>=4.10.0.84
+
+# Web app
+streamlit>=1.37.0
+
+# Utilidades
+tqdm>=4.66.4
+python-dotenv>=1.0.1
