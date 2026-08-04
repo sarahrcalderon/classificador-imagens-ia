@@ -22,9 +22,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# ============================================
-# TÍTULO E DESCRIÇÃO
-# ============================================
+
 st.title("🤖 Classificador de Imagens")
 
 st.markdown("""
@@ -100,9 +98,7 @@ MAPEAMENTO_IMAGENET = {
     591: 'Caminhão', 592: 'Caminhão',
 }
 
-# ============================================
-# CARREGAR MODELO
-# ============================================
+
 @st.cache_resource
 def carregar_modelo():
     """Carrega o modelo ResNet18 pré-treinado"""
@@ -125,16 +121,13 @@ def carregar_modelo():
         
         return modelo, dispositivo, True
     except Exception as e:
-        st.error(f"❌ Erro ao carregar modelo: {e}")
+        st.error(f" Erro ao carregar modelo: {e}")
         return None, None, False
 
 def traduzir_classe(idx):
     """Traduz o índice da classe ImageNet para CIFAR-10"""
     return MAPEAMENTO_IMAGENET.get(idx, None)
 
-# ============================================
-# PREPROCESSAMENTO
-# ============================================
 def preprocessar_imagem(imagem):
     """Preprocessa a imagem para o modelo"""
     transformacoes = transforms.Compose([
@@ -150,9 +143,7 @@ def preprocessar_imagem(imagem):
     tensor = tensor.unsqueeze(0)
     return tensor
 
-# ============================================
-# CLASSIFICAR
-# ============================================
+
 def classificar_imagem(modelo, tensor, dispositivo):
     """Classifica a imagem"""
     tensor = tensor.to(dispositivo)
@@ -178,32 +169,29 @@ def classificar_imagem(modelo, tensor, dispositivo):
     # Se não encontrou nenhuma classe mapeada
     return "Classe não mapeada", 0, top5_prob, top5_idx
 
-# ============================================
-# MAIN
-# ============================================
 def main():
-    # Carregar modelo
+    
     modelo, dispositivo, carregado = carregar_modelo()
     
     if not carregado:
-        st.error("❌ Erro ao carregar o modelo. Tente novamente mais tarde.")
+        st.error(" Erro ao carregar o modelo. Tente novamente mais tarde.")
         st.stop()
     
     # Upload de imagem
     st.markdown("---")
     arquivo = st.file_uploader(
-        "📤 Selecione uma imagem",
+        " Selecione uma imagem",
         type=['jpg', 'jpeg', 'png']
     )
     
     # Imagens de exemplo
-    st.markdown("### 🖼️ Ou teste com uma imagem de exemplo:")
+    st.markdown("###  Ou teste com uma imagem de exemplo:")
     
     exemplos = {
-        "🐱 Gato": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/800px-Cat_November_2010-1a.jpg",
-        "🐕 Cachorro": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Collage_of_Nine_Dogs.jpg/800px-Collage_of_Nine_Dogs.jpg",
-        "✈️ Avião": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Boeing_787-9_N29961_United_Airlines_%2848615635871%29.jpg/800px-Boeing_787-9_N29961_United_Airlines_%2848615635871%29.jpg",
-        "🚗 Carro": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/2013_Volkswagen_Golf_VII_1.4.jpg/800px-2013_Volkswagen_Golf_VII_1.4.jpg",
+        " Gato": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/800px-Cat_November_2010-1a.jpg",
+        " Cachorro": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Collage_of_Nine_Dogs.jpg/800px-Collage_of_Nine_Dogs.jpg",
+        " Avião": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Boeing_787-9_N29961_United_Airlines_%2848615635871%29.jpg/800px-Boeing_787-9_N29961_United_Airlines_%2848615635871%29.jpg",
+        " Carro": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/2013_Volkswagen_Golf_VII_1.4.jpg/800px-2013_Volkswagen_Golf_VII_1.4.jpg",
     }
     
     col1, col2, col3, col4 = st.columns(4)
@@ -222,7 +210,7 @@ def main():
                         )
                     
                     st.image(imagem, caption=f"Exemplo: {nome}", width=200)
-                    st.success(f"🎯 {classe_prevista}")
+                    st.success(f" {classe_prevista}")
                     st.info(f"Confiança: {confianca:.1f}%")
                     
                 except Exception as e:
@@ -233,8 +221,8 @@ def main():
         imagem = Image.open(arquivo)
         st.image(imagem, caption="📷 Sua imagem", width=300)
         
-        if st.button("🔍 Classificar!", type="primary", use_container_width=True):
-            with st.spinner("🤔 Analisando..."):
+        if st.button(" Classificar!", type="primary", use_container_width=True):
+            with st.spinner(" Analisando..."):
                 try:
                     tensor = preprocessar_imagem(imagem)
                     classe_prevista, confianca, top5_prob, top5_idx = classificar_imagem(
@@ -242,8 +230,8 @@ def main():
                     )
                     
                     # Resultado
-                    st.success(f"🎯 **Classe prevista: {classe_prevista}**")
-                    st.info(f"📊 **Confiança: {confianca:.1f}%**")
+                    st.success(f" **Classe prevista: {classe_prevista}**")
+                    st.info(f" **Confiança: {confianca:.1f}%**")
                     
                     # Top 5
                     st.markdown("### 📋 Top 5 classes")
