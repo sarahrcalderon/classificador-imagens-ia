@@ -1,7 +1,3 @@
-"""
-Módulo para carregar e preparar datasets
-"""
-
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -11,7 +7,7 @@ import logging
 
 from src.utils.config import config
 
-# Configurar logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -47,13 +43,6 @@ class DataManager:
         return self._transformacoes_teste
     
     def carregar_datasets(self) -> Tuple[Dataset, Dataset]:
-        """
-        Carrega os datasets de treino e teste
-        
-        Retorna:
-            Tuple[Dataset, Dataset]: (dataset_treino, dataset_teste)
-        """
-        logger.info("Carregando datasets CIFAR-10...")
         
         dataset_treino = torchvision.datasets.CIFAR10(
             root=str(self.config.DADOS_DIR),
@@ -80,17 +69,7 @@ class DataManager:
         dataset_teste: Dataset,
         batch_size: Optional[int] = None
     ) -> Tuple[DataLoader, DataLoader]:
-        """
-        Cria os DataLoaders para treino e teste
-        
-        Args:
-            dataset_treino: Dataset de treino
-            dataset_teste: Dataset de teste
-            batch_size: Tamanho do batch (opcional)
-        
-        Retorna:
-            Tuple[DataLoader, DataLoader]: (loader_treino, loader_teste)
-        """
+
         batch_size = batch_size or self.config.BATCH_SIZE
         
         loader_treino = DataLoader(
@@ -113,15 +92,12 @@ class DataManager:
         return loader_treino, loader_teste
     
     def obter_classes(self) -> Tuple:
-        """Retorna os nomes das classes"""
         return self.config.CLASSES
 
 
 def get_data_manager() -> DataManager:
-    """Retorna uma instância do DataManager"""
     return DataManager()
 
 
 def get_class_names() -> Tuple:
-    """Retorna os nomes das classes"""
     return config.CLASSES

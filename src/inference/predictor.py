@@ -1,7 +1,3 @@
-"""
-Módulo para fazer predições com o modelo treinado
-"""
-
 import torch
 import torchvision.transforms as transforms
 from PIL import Image
@@ -15,10 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class ImagePredictor:
-    """
-    Faz predições de imagem usando o modelo treinado
-    """
-    
+
     def __init__(self, modelo: torch.nn.Module, dispositivo: torch.device):
         self.modelo = modelo
         self.dispositivo = dispositivo
@@ -33,20 +26,10 @@ class ImagePredictor:
         self.classes = config.CLASSES
     
     def preprocessar(self, imagem: Union[str, Path, Image.Image]) -> torch.Tensor:
-        """
-        Preprocessa a imagem para o modelo
-        
-        Args:
-            imagem: Caminho para a imagem ou objeto PIL Image
-        
-        Retorna:
-            torch.Tensor: Tensor pronto para o modelo
-        """
-        # Carregar imagem
+
         if isinstance(imagem, (str, Path)):
             imagem = Image.open(imagem)
-        
-        # Converter para RGB
+
         if imagem.mode != 'RGB':
             imagem = imagem.convert('RGB')
         
@@ -61,16 +44,6 @@ class ImagePredictor:
         imagem: Union[str, Path, Image.Image],
         top_k: int = 3
     ) -> Dict:
-        """
-        Faz a predição da imagem
-        
-        Args:
-            imagem: Caminho ou imagem PIL
-            top_k: Número de top classes para retornar
-        
-        Retorna:
-            Dict: Resultados da predição
-        """
 
         tensor = self.preprocessar(imagem)
         
@@ -114,16 +87,7 @@ class ImagePredictor:
         imagens: List[Union[str, Path, Image.Image]],
         top_k: int = 3
     ) -> List[Dict]:
-        """
-        Faz predições para múltiplas imagens
-        
-        Args:
-            imagens: Lista de caminhos ou imagens PIL
-            top_k: Número de top classes para retornar
-        
-        Retorna:
-            List[Dict]: Resultados para cada imagem
-        """
+
         return [self.predizer(img, top_k) for img in imagens]
 
 
@@ -131,5 +95,4 @@ def criar_predictor(
     modelo: torch.nn.Module,
     dispositivo: torch.device
 ) -> ImagePredictor:
-    """Cria uma instância do predictor"""
     return ImagePredictor(modelo, dispositivo)

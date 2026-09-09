@@ -1,7 +1,3 @@
-"""
-Aplicação web com Streamlit - Versão Compatível com Python 3.14+
-"""
-
 import streamlit as st
 from PIL import Image
 import torch
@@ -13,9 +9,6 @@ import requests
 from io import BytesIO
 import sys
 
-# ============================================
-# CONFIGURAÇÃO DA PÁGINA
-# ============================================
 st.set_page_config(
     page_title="Classificador de Imagens",
     page_icon="🤖",
@@ -23,28 +16,22 @@ st.set_page_config(
 )
 
 
-st.title("🤖 Classificador de Imagens")
+st.title(" Classificador de Imagens")
 
 st.markdown("""
 Envie uma imagem e o modelo vai classificar entre **10 categorias**:
 
-✈️ Avião | 🚗 Automóvel | 🐦 Pássaro | 🐱 Gato | 🦌 Veado | 🐕 Cachorro | 🐸 Sapo | 🐴 Cavalo | 🚢 Navio | 🚛 Caminhão
+ Avião |  Automóvel |  Pássaro |  Gato |  Veado |  Cachorro |  Sapo |  Cavalo |  Navio | 🚛Caminhão
 """)
 
-# ============================================
-# CLASSES E MAPEAMENTO
-# ============================================
 CLASSES_CIFAR10 = ['Avião', 'Automóvel', 'Pássaro', 'Gato', 'Veado', 
                    'Cachorro', 'Sapo', 'Cavalo', 'Navio', 'Caminhão']
 
-# Mapeamento de classes do ImageNet para CIFAR-10
+
 MAPEAMENTO_IMAGENET = {
-    # Avião
     404: 'Avião', 405: 'Avião', 406: 'Avião', 407: 'Avião', 408: 'Avião',
-    # Automóvel
     436: 'Automóvel', 437: 'Automóvel', 438: 'Automóvel', 439: 'Automóvel', 
     440: 'Automóvel', 441: 'Automóvel', 442: 'Automóvel', 443: 'Automóvel',
-    # Pássaro
     8: 'Pássaro', 9: 'Pássaro', 10: 'Pássaro', 11: 'Pássaro', 12: 'Pássaro',
     13: 'Pássaro', 14: 'Pássaro', 15: 'Pássaro', 16: 'Pássaro', 17: 'Pássaro',
     18: 'Pássaro', 19: 'Pássaro', 20: 'Pássaro', 21: 'Pássaro', 22: 'Pássaro',
@@ -53,14 +40,11 @@ MAPEAMENTO_IMAGENET = {
     88: 'Pássaro', 89: 'Pássaro', 90: 'Pássaro', 91: 'Pássaro', 92: 'Pássaro',
     93: 'Pássaro', 94: 'Pássaro', 95: 'Pássaro', 96: 'Pássaro', 97: 'Pássaro',
     98: 'Pássaro', 99: 'Pássaro', 100: 'Pássaro',
-    # Gato
     281: 'Gato', 282: 'Gato', 283: 'Gato', 284: 'Gato', 285: 'Gato',
     286: 'Gato', 287: 'Gato', 288: 'Gato', 289: 'Gato', 290: 'Gato',
     291: 'Gato', 292: 'Gato', 293: 'Gato', 294: 'Gato', 295: 'Gato',
-    # Veado
     341: 'Veado', 342: 'Veado', 343: 'Veado', 344: 'Veado', 345: 'Veado',
     346: 'Veado', 347: 'Veado', 348: 'Veado',
-    # Cachorro
     151: 'Cachorro', 152: 'Cachorro', 153: 'Cachorro', 154: 'Cachorro',
     155: 'Cachorro', 156: 'Cachorro', 157: 'Cachorro', 158: 'Cachorro',
     159: 'Cachorro', 160: 'Cachorro', 161: 'Cachorro', 162: 'Cachorro',
@@ -77,15 +61,12 @@ MAPEAMENTO_IMAGENET = {
     203: 'Cachorro', 204: 'Cachorro', 205: 'Cachorro', 206: 'Cachorro',
     207: 'Cachorro', 208: 'Cachorro', 209: 'Cachorro', 210: 'Cachorro',
     211: 'Cachorro', 212: 'Cachorro',
-    # Sapo
+
     30: 'Sapo', 31: 'Sapo', 32: 'Sapo', 33: 'Sapo', 34: 'Sapo',
     349: 'Sapo', 350: 'Sapo',
-    # Cavalo
     354: 'Cavalo', 355: 'Cavalo', 356: 'Cavalo', 357: 'Cavalo',
-    # Navio
     779: 'Navio', 780: 'Navio', 781: 'Navio', 782: 'Navio', 783: 'Navio',
     784: 'Navio', 785: 'Navio', 786: 'Navio', 787: 'Navio',
-    # Caminhão
     555: 'Caminhão', 556: 'Caminhão', 557: 'Caminhão', 558: 'Caminhão',
     559: 'Caminhão', 560: 'Caminhão', 561: 'Caminhão', 562: 'Caminhão',
     563: 'Caminhão', 564: 'Caminhão', 565: 'Caminhão', 566: 'Caminhão',
@@ -101,20 +82,17 @@ MAPEAMENTO_IMAGENET = {
 
 @st.cache_resource
 def carregar_modelo():
-    """Carrega o modelo ResNet18 pré-treinado"""
+
     try:
-        # Verificar versão do Python
-        st.info(f"🐍 Python {sys.version}")
+        st.info(f" Python {sys.version}")
         
-        # Detectar dispositivo
         if torch.cuda.is_available():
             dispositivo = torch.device("cuda")
-            st.success("🟢 GPU detectada!")
+            st.success(" GPU detectada!")
         else:
             dispositivo = torch.device("cpu")
-            st.info("🟡 Usando CPU (mais lento)")
+            st.info(" Usando CPU (mais lento)")
         
-        # Carregar modelo - versão compatível
         modelo = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
         modelo = modelo.to(dispositivo)
         modelo.eval()
@@ -125,11 +103,9 @@ def carregar_modelo():
         return None, None, False
 
 def traduzir_classe(idx):
-    """Traduz o índice da classe ImageNet para CIFAR-10"""
     return MAPEAMENTO_IMAGENET.get(idx, None)
 
 def preprocessar_imagem(imagem):
-    """Preprocessa a imagem para o modelo"""
     transformacoes = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
@@ -145,19 +121,16 @@ def preprocessar_imagem(imagem):
 
 
 def classificar_imagem(modelo, tensor, dispositivo):
-    """Classifica a imagem"""
     tensor = tensor.to(dispositivo)
     
     with torch.no_grad():
         saidas = modelo(tensor)
         probabilidades = torch.softmax(saidas, dim=1)
     
-    # Top 5
     top5_prob, top5_idx = torch.topk(probabilidades, 5)
     top5_prob = top5_prob.cpu().numpy().flatten()
     top5_idx = top5_idx.cpu().numpy().flatten()
     
-    # Tentar encontrar classe traduzida
     classe_encontrada = None
     prob_encontrada = 0
     
@@ -166,7 +139,6 @@ def classificar_imagem(modelo, tensor, dispositivo):
         if classe:
             return classe, prob * 100, top5_prob, top5_idx
     
-    # Se não encontrou nenhuma classe mapeada
     return "Classe não mapeada", 0, top5_prob, top5_idx
 
 def main():
@@ -177,14 +149,12 @@ def main():
         st.error(" Erro ao carregar o modelo. Tente novamente mais tarde.")
         st.stop()
     
-    # Upload de imagem
     st.markdown("---")
     arquivo = st.file_uploader(
         " Selecione uma imagem",
         type=['jpg', 'jpeg', 'png']
     )
     
-    # Imagens de exemplo
     st.markdown("###  Ou teste com uma imagem de exemplo:")
     
     exemplos = {
@@ -216,7 +186,6 @@ def main():
                 except Exception as e:
                     st.error(f"Erro: {e}")
     
-    # Processar imagem enviada
     if arquivo is not None:
         imagem = Image.open(arquivo)
         st.image(imagem, caption="📷 Sua imagem", width=300)
@@ -229,14 +198,12 @@ def main():
                         modelo, tensor, dispositivo
                     )
                     
-                    # Resultado
+   
                     st.success(f" **Classe prevista: {classe_prevista}**")
                     st.info(f" **Confiança: {confianca:.1f}%**")
+         
+                    st.markdown("###  Top 5 classes")
                     
-                    # Top 5
-                    st.markdown("### 📋 Top 5 classes")
-                    
-                    # Preparar dados para o gráfico
                     nomes = []
                     probs = []
                     
@@ -253,7 +220,6 @@ def main():
                         
                         st.write(f"{i+1}. **{nomes[-1]}**: {probs[-1]:.1f}%")
                     
-                    # Gráfico
                     fig, ax = plt.subplots(figsize=(8, 4))
                     cores = ['#2ecc71' if i == 0 else '#3498db' for i in range(5)]
                     ax.barh(nomes, probs, color=cores)
@@ -269,7 +235,7 @@ def main():
                     plt.close()
                     
                 except Exception as e:
-                    st.error(f"❌ Erro: {e}")
+                    st.error(f" Erro: {e}")
 
 
 if __name__ == "__main__":

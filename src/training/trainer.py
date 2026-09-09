@@ -1,7 +1,3 @@
-"""
-Módulo para treino e avaliação de modelos
-"""
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -17,10 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class Trainer:
-    """
-    Gerencia o treino e avaliação do modelo
-    """
-    
+
     def __init__(
         self,
         modelo: nn.Module,
@@ -30,8 +23,7 @@ class Trainer:
         self.modelo = modelo
         self.dispositivo = dispositivo
         self.config = config_instance
-        
-        # Configurar critério e otimizador
+
         self.criterio = nn.CrossEntropyLoss()
         self.otimizador = optim.Adam(
             self.modelo.fc.parameters(),
@@ -50,16 +42,7 @@ class Trainer:
         loader_treino: DataLoader,
         epoch: int
     ) -> Tuple[float, float]:
-        """
-        Treina o modelo por uma época
-        
-        Args:
-            loader_treino: DataLoader de treino
-            epoch: Número da época
-        
-        Retorna:
-            Tuple[float, float]: (perda_média, acurácia)
-        """
+
         self.modelo.train()
         perda_total = 0.0
         acertos_total = 0
@@ -106,16 +89,7 @@ class Trainer:
         loader_validacao: DataLoader,
         descricao: str = "Validação"
     ) -> Tuple[float, float]:
-        """
-        Avalia o modelo nos dados de validação
-        
-        Args:
-            loader_validacao: DataLoader de validação
-            descricao: Descrição para o log
-        
-        Retorna:
-            Tuple[float, float]: (perda_média, acurácia)
-        """
+
         self.modelo.eval()
         perda_total = 0.0
         acertos_total = 0
@@ -151,17 +125,6 @@ class Trainer:
         loader_validacao: DataLoader,
         epochs: Optional[int] = None
     ) -> Dict[str, list]:
-        """
-        Executa o treino completo
-        
-        Args:
-            loader_treino: DataLoader de treino
-            loader_validacao: DataLoader de validação
-            epochs: Número de épocas (opcional)
-        
-        Retorna:
-            Dict: Histórico do treino
-        """
         epochs = epochs or self.config.EPOCHS
         
         logger.info(f"Iniciando treino por {epochs} épocas...")
@@ -195,15 +158,7 @@ class Trainer:
         return self.historico
     
     def _redimensionar_imagens(self, imagens: torch.Tensor) -> torch.Tensor:
-        """
-        Redimensiona imagens para o tamanho esperado pelo modelo
-        
-        Args:
-            imagens: Tensor com imagens [batch, canais, altura, largura]
-        
-        Retorna:
-            torch.Tensor: Imagens redimensionadas
-        """
+
         tamanho = self.config.TAMANHO_ENTRADA
         return torch.nn.functional.interpolate(
             imagens,
@@ -214,10 +169,7 @@ class Trainer:
 
 
 class ModelEvaluator:
-    """
-    Avalia o modelo com métricas detalhadas
-    """
-    
+
     def __init__(self, modelo: nn.Module, dispositivo: torch.device):
         self.modelo = modelo
         self.dispositivo = dispositivo
@@ -227,19 +179,7 @@ class ModelEvaluator:
         loader: DataLoader,
         classes: Tuple[str]
     ) -> Dict:
-        """
-        Avalia o modelo com métricas detalhadas
-        
-        Args:
-            loader: DataLoader com dados
-            classes: Nomes das classes
-        
-        Retorna:
-            Dict: Métricas detalhadas
-        """
         self.modelo.eval()
-        
-        # Matriz de confusão
         matriz_confusao = torch.zeros(
             len(classes), len(classes), dtype=torch.long
         )
@@ -248,8 +188,7 @@ class ModelEvaluator:
             for imagens, rotulos in tqdm(loader, desc="Avaliando"):
                 imagens = imagens.to(self.dispositivo)
                 rotulos = rotulos.to(self.dispositivo)
-                
-                # Redimensionar
+
                 imagens = torch.nn.functional.interpolate(
                     imagens,
                     size=(224, 224),
