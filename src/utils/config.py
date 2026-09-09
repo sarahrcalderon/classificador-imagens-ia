@@ -3,7 +3,6 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Optional
 
-
 @dataclass
 class Config:
 
@@ -15,10 +14,10 @@ class Config:
 
     NOME_DATASET: str = "CIFAR10"
     NUM_CLASSES: int = 10
-    TAMANHO_IMAGEM: int = 32  # CIFAR-10 original
+    TAMANHO_IMAGEM: int = 32  
 
     MODELO_BASE: str = "resnet18"
-    TAMANHO_ENTRADA: int = 224  # ResNet espera 224x224
+    TAMANHO_ENTRADA: int = 224  
 
     BATCH_SIZE: int = 64
     LEARNING_RATE: float = 0.001

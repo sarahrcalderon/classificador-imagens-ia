@@ -1,7 +1,3 @@
-"""
-Script para treinar o modelo
-"""
-
 import sys
 from pathlib import Path
 
@@ -28,27 +24,23 @@ def main():
     print(" TREINANDO O CLASSIFICADOR")
     print("="*60 + "\n")
     
-    # 1. Configurar seed
+
     set_seed(config.SEED)
     
-    # 2. Definir dispositivo
     dispositivo = get_dispositivo()
     logger.info(f"Usando dispositivo: {dispositivo}")
     
-    # 3. Carregar dados
     logger.info("Carregando dados...")
     data_manager = DataManager()
     dataset_treino, dataset_teste = data_manager.carregar_datasets()
     loader_treino, loader_teste = data_manager.criar_dataloaders(
         dataset_treino, dataset_teste
     )
-    
-    # 4. Criar modelo
+
     logger.info("Criando modelo...")
     classificador = ClassificadorImagens()
     modelo = classificador.criar_modelo()
     
-    # 5. Treinar
     logger.info("Iniciando treino...")
     trainer = Trainer(modelo, dispositivo)
     
@@ -56,16 +48,13 @@ def main():
         loader_treino=loader_treino,
         loader_validacao=loader_teste
     )
-    
-    # 6. Salvar modelo
+
     caminho_modelo = config.get_model_path('classificador.pth')
     classificador.salvar_modelo(str(caminho_modelo))
-    
-    # 7. Visualizar resultados
+
     logger.info("Gerando gráficos...")
     plot_historico_treino(historico)
-    
-    # 8. Resumo final
+
     print("\n" + "="*60)
     print(" RESUMO DO TREINO")
     print("="*60)

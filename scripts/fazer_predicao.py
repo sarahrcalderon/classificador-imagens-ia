@@ -1,7 +1,3 @@
-"""
-Script para fazer uma predição com uma imagem
-"""
-
 import sys
 from pathlib import Path
 
@@ -15,7 +11,6 @@ from src.inference.predictor import ImagePredictor
 
 
 def main():
-    """Função principal"""
     parser = argparse.ArgumentParser(description='Classificar uma imagem')
     parser.add_argument('imagem', type=str, help='Caminho para a imagem')
     parser.add_argument('--top_k', type=int, default=3, help='Número de top classes')
@@ -23,13 +18,11 @@ def main():
     args = parser.parse_args()
     
     print("="*60)
-    print("🔮 CLASSIFICANDO IMAGEM")
+    print(" CLASSIFICANDO IMAGEM")
     print("="*60 + "\n")
-    
-    # 1. Definir dispositivo
+
     dispositivo = get_dispositivo()
-    
-    # 2. Carregar modelo
+
     print(f"\n Carregando modelo...")
     classificador = ClassificadorImagens()
     caminho_modelo = config.get_model_path('classificador.pth')
@@ -41,12 +34,10 @@ def main():
         print(" Execute 'scripts/treinar_modelo.py' primeiro")
         return
     
-    # 3. Fazer predição
     print(f"\n Classificando: {args.imagem}")
     predictor = ImagePredictor(modelo, dispositivo)
     resultado = predictor.predizer(args.imagem, top_k=args.top_k)
-    
-    # 4. Mostrar resultados
+
     print("\n" + "="*60)
     print(" RESULTADO")
     print("="*60)

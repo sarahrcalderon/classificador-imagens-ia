@@ -1,11 +1,7 @@
-"""
-Script para explorar o dataset
-"""
-
 import sys
 from pathlib import Path
 
-# Adicionar src ao path
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 import matplotlib.pyplot as plt
@@ -16,15 +12,12 @@ from src.utils.helpers import set_seed
 
 
 def main():
-    """Função principal"""
     print("="*60)
     print(" EXPLORANDO O DATASET")
     print("="*60 + "\n")
     
-    # Definir seed
     set_seed()
     
-    # Carregar dados
     data_manager = DataManager()
     dataset_treino, dataset_teste = data_manager.carregar_datasets()
     classes = get_class_names()
@@ -33,8 +26,7 @@ def main():
     print(f" Imagens de treino: {len(dataset_treino)}")
     print(f" Imagens de teste: {len(dataset_teste)}")
     print(f" Classes: {', '.join(classes)}")
-    
-    # Mostrar distribuição das classes
+
     print("\n" + "="*60)
     print(" DISTRIBUIÇÃO DAS CLASSES")
     print("="*60)
@@ -46,7 +38,7 @@ def main():
     for classe, count in zip(classes, contagens):
         print(f"   {classe}: {count} imagens")
     
-    # Mostrar exemplos
+
     print("\n" + "="*60)
     print(" AMOSTRAS DO DATASET")
     print("="*60)
@@ -58,7 +50,7 @@ def main():
         idx = np.random.randint(0, len(dataset_treino))
         imagem, label = dataset_treino[idx]
         
-        # Desnormalizar
+
         imagem = imagem / 2 + 0.5
         imagem_np = imagem.numpy().transpose(1, 2, 0)
         
